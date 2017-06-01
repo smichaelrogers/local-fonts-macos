@@ -1,0 +1,30 @@
+{
+  "name": "local-fonts-macos",
+  "version": "0.1.0",
+  "description": "Finds all locally installed fonts on macOS.",
+  "license": "MIT",
+  "repository": "smichaelrogers/local-fonts-macos",
+  "author": {
+    "name": "Scott M. Rogers",
+    "email": "mrogerssn@gmail.com",
+    "url": "scottrogers.tech"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "scripts": {
+    "test": "ava"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    ""
+  ],
+  "dependencies": {
+    "nodobjc": "^2.1.0"
+  },
+  "devDependencies": {
+    "ava": "^0.19.1"
+  }
+}
