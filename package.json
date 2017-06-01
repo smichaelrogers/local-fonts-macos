@@ -1,7 +1,7 @@
 {
   "name": "local-fonts-macos",
   "version": "0.1.0",
-  "description": "Finds all locally installed fonts on macOS.",
+  "description": "Creates a list of all available locally installed fonts on macOS.",
   "license": "MIT",
   "repository": "smichaelrogers/local-fonts-macos",
   "author": {

@@ -29,42 +29,38 @@ const FONT_WEIGHTS = {
   [10]: 'ExtraBold',
   [11]: 'Black'
 };
-function getStyle(bits) {
-  return FONT_STYLES[(bits & 0xf) >> 0] || FONT_ATTR_NORMAL;
-}
-function getWidth(bits) {
-  return FONT_WIDTHS[(bits & 0xff) >> 4] || FONT_ATTR_NORMAL;
-}
-function getLayout(bits) {
-  return FONT_LAYOUTS[(bits & 0xfff) >> 8] || FONT_ATTR_NORMAL;
-}
-function getWeight(bits) {
-  return FONT_WEIGHTS[(bits & 0xffff) >> 12] || FONT_ATTR_NORMAL;
-}
-function createFontList(options, callback) {
+
+const getStyle = bits => (FONT_STYLES[(bits & 0xf) >> 0] || FONT_ATTR_NORMAL);
+const getWidth = bits => (FONT_WIDTHS[(bits & 0xff) >> 4] || FONT_ATTR_NORMAL);
+const getLayout = bits => (FONT_LAYOUTS[(bits & 0xfff) >> 8] || FONT_ATTR_NORMAL);
+const getWeight = bits => (FONT_WEIGHTS[(bits & 0xffff) >> 12] || FONT_ATTR_NORMAL);
+
+const getAttributes = bits => {
+  return {
+    style: getStyle(bits),
+    width: getWidth(bits),
+    layout: getLayout(bits),
+    weight: getWeight(bits)
+  }
+};
+
+const createFontList = (options, callback) => {
   ffi.framework('AppKit');
-  const familyEnum = ffi.NSFontManager('sharedFontManager')('availableFontFamilies')('objectEnumerator');
+
   const fonts = {};
+  const familyEnum = ffi.NSFontManager('sharedFontManager')('availableFontFamilies')('objectEnumerator');
   let family;
+
   while ((family = familyEnum('nextObject'))) {
     const memberEnum = ffi.NSFontManager('sharedFontManager')('availableMembersOfFontFamily', family)('objectEnumerator');
     const variants = (fonts[family('UTF8String')] = []);
     let member;
+
     while ((member = memberEnum('nextObject'))) {
       const tbits = +member('objectAtIndex', 3)('stringValue')('UTF8String');
       const wbits = +member('objectAtIndex', 2)('stringValue')('UTF8String');
       const bits = (wbits << 12) | tbits;
-      if (options.expanded) {
-        variants.push({
-          postscriptName: member('objectAtIndex', 0)('UTF8String'),
-          style: getStyle(bits),
-          width: getWidth(bits),
-          layout: getLayout(bits),
-          weight: getWeight(bits),
-        });
-      } else {
-        variants.push(bits);
-      }
+      variants.push(options.expanded ? getAttributes(bits) : bits);
     }
   }
   callback(fonts);
@@ -76,9 +72,11 @@ module.exports = (options) => {
     if (os.platform() !== 'darwin') {
       reject(`macOS/OSX system required (detected ${os.platform()})`)
     }
+
     options = Object.assign({
       expanded: false
     }, options);
+
     createFontList(options, resolve);
   });
 };
